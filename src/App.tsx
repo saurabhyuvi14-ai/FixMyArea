@@ -192,6 +192,7 @@ function LandingPage({ onStartReporting, currentUser, onLogout, onLogin, onAbout
 
 
 
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <main className="min-h-screen bg-background">
       {/* Navigation */}
@@ -201,10 +202,6 @@ function LandingPage({ onStartReporting, currentUser, onLogout, onLogin, onAbout
             <div
               className="flex items-center gap-2 cursor-pointer group"
               onClick={() => {
-                // Return to landing. We don't have setCurrentPage accessible from here directly in App without passing it, 
-                // wait, the Nav is inside LandingPage! So we can use a prop or handle it. 
-                // But wait, the Nav is in LandingPage! 
-                // Ah, the URL or what? Currently LandingPage doesn't have a specific `onHome` prop. But a hard refresh `window.location.reload()` or similar works, or just pass simple callback. Better: `window.scrollTo({top: 0, behavior: 'smooth'})` if it's already landing page.
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
@@ -213,7 +210,20 @@ function LandingPage({ onStartReporting, currentUser, onLogout, onLogin, onAbout
               </div>
               <span className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">FixMyArea</span>
             </div>
-            <div className="flex items-center gap-4">
+            {/* Hamburger for mobile */}
+            <div className="sm:hidden">
+              <button
+                className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Open menu"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            </div>
+            {/* Menu options for desktop */}
+            <div className="hidden sm:flex items-center gap-4">
               {currentUser ? (
                 <>
                   <Button
@@ -259,6 +269,56 @@ function LandingPage({ onStartReporting, currentUser, onLogout, onLogin, onAbout
               )}
             </div>
           </div>
+          {/* Mobile menu dropdown */}
+          {menuOpen && (
+            <div className="sm:hidden absolute left-0 right-0 top-16 bg-background border-b border-border shadow-lg z-50 animate-fade-in">
+              <div className="flex flex-col gap-2 p-4">
+                {currentUser ? (
+                  <>
+                    <Button
+                      variant="ghost"
+                      onClick={() => { setMenuOpen(false); onComplaints(); }}
+                      className="w-full text-left text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                    >
+                      Complaints
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => { setMenuOpen(false); onAboutUs(); }}
+                      className="w-full text-left text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                    >
+                      About Us
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => { setMenuOpen(false); onLogout(); }} className="w-full gap-2">
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      onClick={() => { setMenuOpen(false); onAboutUs(); }}
+                      className="w-full text-left text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                    >
+                      About Us
+                    </Button>
+                    <Button
+                      onClick={() => { setMenuOpen(false); onLogin(); }}
+                      variant="ghost"
+                      className="w-full text-left text-sm font-medium hover:bg-primary hover:text-primary-foreground hover:scale-105 hover:shadow-lg transition-all duration-300"
+                    >
+                      Sign In
+                    </Button>
+                    <Button onClick={() => { setMenuOpen(false); onStartReporting(); }} className="w-full btn-primary">
+                      Get Started
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
